@@ -5,7 +5,7 @@
    - app shell (html/css/js): stale-while-revalidate.
    - No se interceptan las conexiones de PeerJS (WebRTC va fuera de SW).
    ===================================================== */
-const VERSION = "bn-v1";
+const VERSION = "bn-v1.0.0";
 const SHELL = [
   "./",
   "./index.html",
