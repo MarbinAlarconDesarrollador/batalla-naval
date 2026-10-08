@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Batalla Naval P2P</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Saira+Stencil+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icons/pwa-icon-144.png" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/pwa-icon-192.png" />
+    <link rel="mask-icon" href="icons/pwa-icon-192.png" color="#c9a24a" />
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- PeerJS (CDN oficial en unpkg) -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <!-- Ventana de resultado: aparece al terminar la partida -->
+    <div id="resultOverlay" class="ov" aria-hidden="true">
+      <div
+        class="card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resTitle"
+      >
+        <h2 id="resTitle"></h2>
+        <p id="resSub"></p>
+        <div id="resStats" class="stats"></div>
+        <div class="row end">
+          <button id="btnResClose" class="alt" type="button">
+            Ver tableros</button
+          ><button id="btnResAgain" type="button">Jugar de nuevo</button>
+        </div>
+      </div>
+    </div>
+    <!-- Ventana de reglas -->
+    <div id="rulesOverlay" class="ov" aria-hidden="true">
+      <div
+        class="card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rulesTitle"
+      >
+        <h2 id="rulesTitle">Reglas y cómo se juega</h2>
+        <h3>Objetivo</h3>
+        <p>Hundir toda la flota del rival antes de que él hunda la tuya.</p>
+        <h3>Flota (cada jugador)</h3>
+        <ul>
+          <li>Portaviones: 5 casillas</li>
+          <li>Buque: 4</li>
+          <li>Crucero: 3</li>
+          <li>Submarino: 3</li>
+          <li>Destructor: 2</li>
+        </ul>
+        <h3>Cómo se juega</h3>
+        <ol>
+          <li>
+            Un jugador pulsa <b>Generar mi ID</b> y comparte el código (ej.
+            <b>MA-482910</b>). El otro lo escribe y pulsa <b>Conectar</b>.
+          </li>
+          <li>
+            Coloca tus barcos: elige uno, haz clic en tu tablero y rota con
+            <b>R</b> (o el botón). También puedes usar <b>Aleatorio</b>. Los
+            barcos no pueden superponerse ni salirse.
+          </li>
+          <li>
+            Pulsa <b>Estoy listo</b>. Cuando ambos estén listos, el anfitrión
+            pulsa <b>Iniciar batalla</b>.
+          </li>
+          <li>
+            Tras la cuenta regresiva, se juega por turnos: en tu turno elige una
+            casilla de las <b>Aguas enemigas</b>.
+          </li>
+          <li>
+            Llama = impacto (sigues viendo el resultado); ondas = agua. Cuando
+            todas las casillas de un barco son impactadas, se hunde.
+          </li>
+          <li>Los turnos se alternan después de cada disparo.</li>
+          <li>Gana quien hunda primero toda la flota rival.</li>
+        </ol>
+        <h3>Consejos</h3>
+        <ul>
+          <li>
+            Tras un impacto, prueba las casillas vecinas para encontrar la
+            dirección del barco.
+          </li>
+          <li>Dispara en patrón de tablero de ajedrez para cubrir más agua.</li>
+        </ul>
+        <div class="row end">
+          <button id="btnRulesClose" type="button">Entendido</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      /* Tema inicial (antes de pintar para evitar parpadeo): guardado o el del sistema */
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("bn_theme") ||
+          (matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark");
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Batalla Naval</h1>
+      <div class="hr">
+        <button id="btnRules" class="alt tog" type="button">Reglas</button>
+        <button id="btnTheme" class="alt tog" type="button">Modo claro</button>
+        <button id="btnMusic" class="alt tog" aria-pressed="true">
+          Música
+        </button>
+        <button id="btnSfx" class="alt tog" aria-pressed="true">Efectos</button>
+        <input id="vol" type="range" min="0" max="100" aria-label="Volumen" />
+        <span id="status" class="pill"
+          ><i></i><span id="statusTxt">Desconectado</span></span
+        >
+      </div>
+    </header>
+
+    <main>
+      <!-- Panel de conexión -->
+      <section class="panel conn" id="connPanel">
+        <div>
+          <h2>Crear partida</h2>
+          <div class="row" style="margin-top: 10px">
+            <button id="btnCreate">Generar mi ID</button>
+            <div id="myId">—</div>
+            <button id="btnCopy" class="alt" disabled>Copiar</button>
+          </div>
+          <p class="small">
+            Comparte este ID con tu rival (Jugador 1 / anfitrión).
+          </p>
+        </div>
+        <div>
+          <h2>Unirse a una partida</h2>
+          <div class="row">
+            <input
+              id="peerInput"
+              placeholder="MA-123456"
+              autocapitalize="characters"
+              autocomplete="off"
+              aria-label="ID del anfitrión"
+            /><button id="btnJoin">Conectar</button>
+          </div>
+          <p class="small" id="connMsg">Jugador 2: pega el ID y conecta.</p>
+        </div>
+      </section>
+
+      <div id="banner">Conecta con tu rival para empezar</div>
+
+      <div class="boards">
+        <!-- Tablero propio -->
+        <section>
+          <h2>Tu flota</h2>
+          <div class="board" id="ownBoard"></div>
+          <div class="fleet" id="fleet"></div>
+          <div class="row">
+            <button id="btnRandom" class="alt">Aleatorio</button>
+            <button id="btnRotate" class="alt">Rotar (R)</button>
+            <button id="btnClear" class="alt">Limpiar</button>
+          </div>
+          <p class="small" id="hint">
+            Elige un barco, pasa el cursor sobre tu tablero y haz clic para
+            colocarlo. Toca un barco ya colocado en la lista para moverlo.
+          </p>
+          <div class="row" style="margin-top: 12px">
+            <button id="btnReady">Estoy listo</button>
+            <button id="btnStart" hidden>Iniciar batalla</button>
+            <button id="btnRestart" hidden>Jugar de nuevo</button>
+          </div>
+        </section>
+
+        <!-- Tablero de ataque -->
+        <section>
+          <h2>Aguas enemigas</h2>
+          <div class="board attack" id="atkBoard"></div>
+          <div class="fleet" id="enemyFleet"></div>
+          <p class="small" id="oppState">El rival aún no está conectado.</p>
+        </section>
+      </div>
+      <details class="panel">
+        <summary>Personalizar barcos y música</summary>
+        <p class="small">
+          Sube una imagen por barco (mejor PNG/WebP con fondo transparente,
+          vista desde arriba, proa hacia la derecha). Se guardan en este
+          navegador.
+        </p>
+        <div class="cust" id="shipCustom"></div>
+        <div class="row">
+          <label class="btn alt"
+            >Música propia (mp3, ogg…)<input
+              type="file"
+              accept="audio/*"
+              id="musicFile"
+              class="vh"
+          /></label>
+          <button id="btnMusicReset" class="alt">Música original</button>
+        </div>
+      </details>
+    </main>
+    <footer>Desarrollado por <b>Marbin Alarcón</b></footer>
+
+    <div id="countdownOverlay" aria-hidden="true">
+      <div id="countdownCard" role="status" aria-live="assertive">
+        <div id="radar" aria-hidden="true"></div>
+        <div id="countdownTitle">BATALLA INMINENTE</div>
+        <div id="countdownNumber">5</div>
+        <p id="countdownText">Prepárate…</p>
+      </div>
+    </div>
+    <div id="restartOverlay" aria-hidden="true">
+      <div
+        id="restartCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="restartTitle"
+      >
+        <h2 id="restartTitle">¿Jugar de nuevo?</h2>
+        <p id="restartText">
+          La partida actual se reiniciará para los dos jugadores y se perderá el
+          progreso. ¿Estás seguro?
+        </p>
+        <div id="restartActions">
+          <button id="btnCancelRestart" class="alt" type="button">
+            Cancelar</button
+          ><button id="btnConfirmRestart" type="button">Sí, reiniciar</button>
+        </div>
+      </div>
+    </div>
+    <script src="js/app.js" defer></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(console.error);
+        });
+      }
+    </script>
+  </body>
+</html>

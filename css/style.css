@@ -1,0 +1,834 @@
+:root {
+    --abyss: #071722;
+    --panel: #0f2b3d;
+    --edge: #25536d;
+    --sea: #1b5870;
+    --foam: #dcedf0;
+    --mute: #8fb0bd;
+    --brass: #c9a24a;
+    --flare: #ee5a33;
+    --ok: #3fa57a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--foam);
+    background:
+        radial-gradient(1100px 520px at 75% -8%, #17506f, transparent 70%),
+        linear-gradient(#0a2232, #061420 70%) fixed;
+    font:
+        400 16px/1.45 "Barlow",
+        system-ui,
+        sans-serif;
+}
+
+h1,
+h2 {
+    font-family: "Saira Stencil One", "Barlow Condensed", sans-serif;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.04em;
+}
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px clamp(16px, 4vw, 40px);
+    border-bottom: 3px solid var(--brass);
+    background: #08202f;
+}
+
+h1 {
+    font-size: 2.3rem;
+    color: var(--brass);
+}
+
+.hr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid var(--edge);
+    background: #0c2434;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.pill i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--flare);
+}
+
+.pill.wait i {
+    background: var(--brass);
+}
+
+.pill.on i {
+    background: var(--ok);
+}
+
+main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 20px clamp(16px, 4vw, 40px) 48px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-top: 3px solid var(--brass);
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.conn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+@media (max-width: 700px) {
+    .conn {
+        grid-template-columns: 1fr;
+    }
+}
+
+input {
+    font: inherit;
+    padding: 9px 10px;
+    border: 1px solid var(--edge);
+    background: #08202f;
+    color: var(--foam);
+    min-width: 0;
+    flex: 1;
+}
+
+input[type="range"] {
+    flex: none;
+    width: 90px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: var(--brass);
+}
+
+button,
+.btn {
+    font:
+        600 1rem "Barlow",
+        sans-serif;
+    padding: 9px 16px;
+    border: 2px solid var(--brass);
+    background: var(--brass);
+    color: #1a1405;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+}
+
+button.alt,
+.btn.alt {
+    background: transparent;
+    color: var(--foam);
+    border-color: var(--edge);
+}
+
+button:not(.cell):hover:not(:disabled),
+.btn:hover {
+    background: #e3c06a;
+    color: #1a1405;
+    border-color: #e3c06a;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tog {
+    padding: 6px 12px;
+}
+
+.tog[aria-pressed="false"] {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.vh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+button:focus-visible,
+input:focus-visible,
+.cell:focus-visible,
+.btn:focus-within,
+summary:focus-visible {
+    outline: 3px solid var(--brass);
+    outline-offset: 2px;
+}
+
+.small {
+    font-size: 0.9rem;
+    color: var(--mute);
+    margin: 6px 0 0;
+}
+
+#myId {
+    font-family: ui-monospace, Consolas, monospace;
+    word-break: break-all;
+    background: #08202f;
+    border: 1px dashed var(--brass);
+    padding: 9px 10px;
+    flex: 1;
+    min-height: 42px;
+    max-width: 200px;
+    min-width: 150px;
+}
+
+#banner {
+    background: #08202f;
+    border: 1px solid var(--edge);
+    border-left: 12px solid var(--brass);
+    padding: 12px 18px;
+    font:
+        400 1.35rem "Saira Stencil One",
+        sans-serif;
+    letter-spacing: 0.03em;
+    margin-bottom: 18px;
+}
+
+#banner.mine {
+    border-left-color: var(--ok);
+}
+
+#banner.theirs {
+    border-left-color: var(--flare);
+}
+
+.boards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 860px) {
+    .boards {
+        grid-template-columns: 1fr;
+    }
+}
+
+h2 {
+    font-size: 1.35rem;
+    margin-bottom: 8px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 2px;
+    background: #061420;
+    border: 3px solid var(--brass);
+    padding: 2px;
+    max-width: 480px;
+}
+
+.lbl {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font:
+        600 0.8rem "Barlow Condensed",
+        sans-serif;
+    color: var(--mute);
+    background: #0c2434;
+}
+
+.cell {
+    aspect-ratio: 1;
+    position: relative;
+    padding: 0;
+    border: 0;
+    display: block;
+    background-color: var(--sea);
+    background-image:
+        radial-gradient(circle at 28% 32%,
+            #ffffff1c 0 1.5px,
+            transparent 2.5px),
+        radial-gradient(circle at 72% 70%,
+            #ffffff12 0 1.5px,
+            transparent 2.5px);
+}
+
+.cell.ship {
+    background-color: #164a60;
+}
+
+.cell.pv {
+    background-color: #79b8cc;
+}
+
+.cell.bad {
+    background-color: #c8553c;
+}
+
+.cell.sunk {
+    background-color: #10303f;
+}
+
+.cell.hit::after,
+.cell.sunk::after,
+.cell.miss::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: 3;
+}
+
+.cell.hit::after {
+    background: radial-gradient(circle,
+            #fff3a8 0 14%,
+            #ffb02e 30%,
+            #ee5a33 52%,
+            transparent 70%);
+}
+
+.cell.sunk::after {
+    background: radial-gradient(circle,
+            #ffb02e 0 8%,
+            #8a2a14 28%,
+            #2a0f08cc 55%,
+            transparent 72%);
+}
+
+.cell.miss::after {
+    background: radial-gradient(circle,
+            transparent 0 20%,
+            #ffffffcc 22% 28%,
+            transparent 30% 46%,
+            #ffffff88 48% 53%,
+            transparent 55%);
+}
+
+.attack .cell.open {
+    cursor: crosshair;
+}
+
+.attack.live .cell.open:hover {
+    box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+.attack.live .cell.open:hover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background:
+        linear-gradient(var(--brass), var(--brass)) center/2px 70% no-repeat,
+        linear-gradient(var(--brass), var(--brass)) center/70% 2px no-repeat;
+}
+
+.sh {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    container-type: size;
+}
+
+.sh>* {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 2px #0009);
+}
+
+.sh.v>* {
+    width: 100cqh;
+    height: 100cqw;
+    transform-origin: 0 0;
+    transform: translateX(100cqw) rotate(90deg);
+}
+
+.sh.dead>* {
+    filter: grayscale(0.9) brightness(0.45);
+}
+
+.fleet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.chip {
+    background: #0c2434;
+    color: var(--foam);
+    border: 1px solid var(--edge);
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
+.chip.sel {
+    background: var(--brass);
+    color: #1a1405;
+    border-color: var(--brass);
+}
+
+.chip.placed {
+    border-style: dashed;
+}
+
+.chip.sunk {
+    text-decoration: line-through;
+    background: var(--flare);
+    color: #fff;
+    border-color: var(--flare);
+}
+
+summary {
+    cursor: pointer;
+    font:
+        400 1.2rem "Saira Stencil One",
+        sans-serif;
+    letter-spacing: 0.04em;
+}
+
+.cust {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+}
+
+.cu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--edge);
+    padding: 10px;
+    background: #0c2434;
+}
+
+.th {
+    height: 46px;
+    background: var(--sea);
+    padding: 4px;
+}
+
+.th>* {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#countdownOverlay,
+#restartOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2, 10, 16, 0.88);
+    backdrop-filter: blur(7px);
+    padding: 20px;
+    text-align: center;
+}
+
+#countdownOverlay.show,
+#restartOverlay.show {
+    display: flex;
+}
+
+#countdownCard,
+#restartCard {
+    width: min(460px, 94vw);
+    padding: 30px 24px;
+    background: linear-gradient(180deg, #10364b, #071722);
+    border: 2px solid var(--brass);
+    box-shadow:
+        0 0 50px #000b,
+        0 0 35px #c9a24a33;
+}
+
+#radar {
+    width: 190px;
+    height: 190px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--brass);
+    background:
+        radial-gradient(circle at center,
+            transparent 0 18%,
+            #c9a24a22 18.5% 19.5%,
+            transparent 20% 39%,
+            #c9a24a22 39.5% 40.5%,
+            transparent 41% 59%,
+            #c9a24a22 59.5% 60.5%,
+            transparent 61%),
+        #06202b;
+    box-shadow:
+        0 0 30px #c9a24a44,
+        inset 0 0 30px #000;
+}
+
+#radar:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 50%;
+    height: 2px;
+    background: var(--brass);
+    transform-origin: left center;
+    animation: radarSweep 1s linear infinite;
+    box-shadow: 0 0 10px var(--brass);
+}
+
+#radar:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px;
+    border-radius: 50%;
+    background: #fff1a8;
+    box-shadow: 0 0 15px var(--brass);
+}
+
+@keyframes radarSweep {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#countdownNumber {
+    font:
+        400 5.5rem/1 "Saira Stencil One",
+        sans-serif;
+    color: var(--brass);
+    text-shadow: 0 0 25px #c9a24a88;
+    min-height: 90px;
+}
+
+#countdownTitle {
+    font:
+        400 1.45rem "Saira Stencil One",
+        sans-serif;
+    color: var(--foam);
+    margin-bottom: 8px;
+}
+
+#countdownText,
+#restartText {
+    color: var(--mute);
+    margin: 0;
+}
+
+#restartCard h2 {
+    color: var(--brass);
+    margin-bottom: 10px;
+}
+
+#restartActions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+#restartActions button {
+    min-width: 130px;
+}
+
+@media (max-width: 480px) {
+    #radar {
+        width: 155px;
+        height: 155px;
+    }
+
+    #countdownNumber {
+        font-size: 4.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes pop {
+        from {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+    }
+
+    .cell.hit::after,
+    .cell.sunk::after,
+    .cell.miss::after {
+        animation: pop 0.35s ease-out;
+    }
+
+    .cell {
+        transition: background-color 0.15s;
+    }
+}
+
+/* ===== Responsive, tema claro, footer y ventanas (reglas / resultado) ===== */
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+}
+
+header {
+    padding-top: max(16px, env(safe-area-inset-top));
+}
+
+h1 {
+    font-size: clamp(1.6rem, 6vw, 2.3rem);
+}
+
+.boards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.board {
+    width: 100%;
+    max-width: min(480px, 100%);
+    margin-inline: auto;
+}
+
+@media (max-width: 860px) {
+    .boards {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .hr {
+        width: 100%;
+    }
+
+    .hr .tog {
+        flex: 1 1 auto;
+    }
+
+    .hr input[type="range"] {
+        flex: 1 1 100%;
+        width: auto;
+    }
+
+    .pill {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .row>button,
+    .row>.btn {
+        flex: 1 1 auto;
+    }
+
+    .lbl {
+        font-size: 0.65rem;
+    }
+
+    #banner {
+        font-size: 1.1rem;
+        padding: 10px 12px;
+    }
+
+    .panel {
+        padding: 12px;
+    }
+
+    #restartActions {
+        flex-wrap: wrap;
+    }
+}
+
+footer {
+    text-align: center;
+    padding: 18px 16px max(18px, env(safe-area-inset-bottom));
+    border-top: 3px solid var(--brass);
+    background: #08202f;
+    color: var(--mute);
+    font-size: 0.95rem;
+}
+
+footer b {
+    color: var(--foam);
+}
+
+.ov {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    background: rgba(2, 10, 16, 0.88);
+    backdrop-filter: blur(6px);
+    padding: 16px;
+    overflow: auto;
+}
+
+.ov.show {
+    display: flex;
+}
+
+.ov .card {
+    margin: auto;
+    width: min(560px, 100%);
+    padding: 24px;
+    background: linear-gradient(180deg, #10364b, #071722);
+    border: 2px solid var(--brass);
+    color: var(--foam);
+}
+
+.ov h2 {
+    color: var(--brass);
+}
+
+.ov h3 {
+    font:
+        400 1.05rem "Saira Stencil One",
+        sans-serif;
+    letter-spacing: 0.04em;
+    margin: 16px 0 4px;
+}
+
+.ov ol,
+.ov ul {
+    padding-left: 1.2em;
+    margin: 0.3em 0;
+}
+
+.ov li {
+    margin: 0.35em 0;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.stat {
+    border: 1px solid var(--edge);
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--mute);
+}
+
+.stat b {
+    display: block;
+    font:
+        400 1.6rem "Saira Stencil One",
+        sans-serif;
+    color: var(--brass);
+}
+
+.end {
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+#confetti {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+/* Tema claro: se activa con <html data-theme="light"> */
+:root[data-theme="light"] {
+    --panel: #fff;
+    --edge: #9db7c2;
+    --sea: #a9d6e3;
+    --foam: #12263a;
+    --mute: #4a6272;
+    --brass: #b8912f;
+}
+
+[data-theme="light"] body {
+    background:
+        radial-gradient(1100px 520px at 75% -8%, #cfe6ee, transparent 70%),
+        #eef4f6 fixed;
+}
+
+[data-theme="light"] :is(header, footer, #banner, input, #myId) {
+    background: #f7fbfc;
+}
+
+[data-theme="light"] :is(.lbl, .pill, .cu, .chip:not(.sel):not(.sunk)) {
+    background: #e6f0f3;
+}
+
+[data-theme="light"] .board {
+    background: #9db7c2;
+}
+
+[data-theme="light"] .cell.ship {
+    background-color: #7fb5c9;
+}
+
+[data-theme="light"] .cell.sunk {
+    background-color: #5f8fa0;
+}
+
+[data-theme="light"] :is(#countdownOverlay, #restartOverlay, .ov) {
+    background: rgba(225, 238, 242, 0.9);
+}
+
+[data-theme="light"] :is(#countdownCard, #restartCard, .ov .card) {
+    background: linear-gradient(180deg, #fff, #e3eef2);
+}
+
+[data-theme="light"] :is(h1, .ov h2, #restartCard h2, #countdownNumber, .stat b, summary) {
+    color: #7a5a12;
+}
